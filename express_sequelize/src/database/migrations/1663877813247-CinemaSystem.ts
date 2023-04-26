@@ -1,4 +1,4 @@
-import { QueryInterface } from 'sequelize';
+import { QueryInterface, literal } from 'sequelize';
 
 export default {
   /**
@@ -31,12 +31,209 @@ export default {
    * As a cinema owner I don't want to configure the seating for every show
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  up: (queryInterface: QueryInterface): Promise<void> => {
-    throw new Error('TODO: implement migration in task 4');
+  up: async (queryInterface: QueryInterface): Promise<void> => {
+    await queryInterface.createTable('users', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true
+      },
+      username: {
+        type: 'varchar',
+        allowNull: false
+      },
+      password: {
+        type: 'varchar',
+        allowNull: false
+      },
+      isAdmin: {
+        type: 'boolean',
+        allowNull: false
+      },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      }
+    });
+
+    await queryInterface.createTable('movies', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true
+      },
+      title: {
+        type: 'varchar',
+        allowNull: false
+      },
+      description: {
+        type: 'varchar',
+        allowNull: false
+      },
+      duration: {
+        type: 'integer',
+        allowNull: false
+      },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      }
+    });
+
+    await queryInterface.createTable('shows', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true
+      },
+      movieId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: 'movies',
+          key: 'id'
+        }
+      },
+      startTime: {
+        type: 'timestamp',
+        allowNull: false
+      },
+      endTime: {
+        type: 'timestamp',
+        allowNull: false
+      },
+      createdAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      }
+    });
+
+    await queryInterface.createTable('seats', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true
+      },
+      type: {
+        type: 'varchar',
+        allowNull: false
+      },
+      showId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: 'Shows',
+          key: 'id'
+        }
+      },
+      createdAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      }
+    });
+
+    await queryInterface.createTable('bookings', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true
+      },
+      userId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id'
+        }
+      },
+      showId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: 'Shows',
+          key: 'id'
+        }
+      },
+      createdAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      }
+    });
+
+    await queryInterface.createTable('booking_details', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true
+      },
+      showSeatId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: 'seats',
+          key: 'id'
+        }
+      },
+      bookingId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: 'bookings',
+          key: 'id'
+        }
+      },
+      price: {
+        type: 'decimal',
+        allowNull: false
+      },
+      createdAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: 'timestamp',
+        allowNull: false,
+        defaultValue: literal('CURRENT_TIMESTAMP')
+      }
+    });
+
+
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  down: (queryInterface: QueryInterface) => {
-    // do nothing
+  down: async (queryInterface: QueryInterface) => {
+    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('movies');
+    await queryInterface.dropTable('shows');
+    await queryInterface.dropTable('seats');
+    await queryInterface.dropTable('bookings');
+    await queryInterface.dropTable('booking_details');
   },
 };
