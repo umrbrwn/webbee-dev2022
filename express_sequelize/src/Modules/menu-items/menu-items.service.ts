@@ -1,6 +1,10 @@
 import { QueryTypes } from "sequelize";
 import MenuItem from "./entities/menu-item.entity";
 
+const arrayToTree = (arr: any[], parentId: number | null = null): any[] =>
+    arr.filter(item => item.parentId === parentId)
+        .map(item => ({ ...item, children: arrayToTree(arr, item.id) }));
+
 export class MenuItemsService {
 
     /* TODO: complete getMenuItems so that it returns a nested menu structure
@@ -94,22 +98,7 @@ export class MenuItemsService {
                 type: QueryTypes.SELECT
             }
         );
-// WIP
-        let map = {};
 
-        data?.forEach(item => {
-          map[item.id] = item;
-          item.children = [];
-        });
-      
-        data.forEach(item => {
-          if (item.parentId !== null) {
-            map[item.parentId].children.push(item);
-          } else {
-            result.push(item);
-          }
-        });
-      
-        return result;
+        return arrayToTree(data as any);
     }
 }
