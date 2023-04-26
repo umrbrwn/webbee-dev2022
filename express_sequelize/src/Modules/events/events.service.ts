@@ -1,4 +1,5 @@
 import Event from './entities/event.entity';
+import Workshop from './entities/workshop.entity';
 
 
 export class EventsService {
@@ -85,7 +86,17 @@ export class EventsService {
      */
 
   async getEventsWithWorkshops() {
-    throw new Error('TODO task 1');
+    return Event.findAll({
+      attributes: ['id', 'name', 'createdAt'],
+      include: [
+        {
+          model: Workshop,
+          attributes: ['id', 'start', 'end', 'eventId', 'name', 'createdAt'],
+          order: [['id', 'ASC']]
+        }
+      ],
+      order: [['id', 'ASC']]
+    });
   }
 
   /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
